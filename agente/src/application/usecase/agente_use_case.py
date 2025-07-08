@@ -1,0 +1,3 @@
+class AgenteUseCase:
+    def processar():
+        
