@@ -3,14 +3,15 @@ from src.infrastructure.dataprovider.conversa_data_provider import ConversaDataP
 
 class ConversaUseCase:
     
-    conversa_data_provider: ConversaDataProvider
+    def __init__(self, conversa_data_provider: ConversaDataProvider):
+        self.conversa_data_provider = conversa_data_provider
     
     def consulta_por_id(self, id: str) -> Conversa:
-        conversa = conversa_data_provider.consultar_por_id(id)
+        conversa = self.conversa_data_provider.consulta_por_id(id)
         if conversa is None:
             raise ConversaNaoEncontradaException()
         return conversa
     
-    def atualiza(conversa: Conversa):
-        conversa_data_provider.salvar(conversa)
+    def atualiza(self, conversa: Conversa):
+        self.conversa_data_provider.salvar(conversa)
         

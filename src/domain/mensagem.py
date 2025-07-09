@@ -1,3 +1,8 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class Mensagem:
-    user_id: str
+    cliente_id: str
+    conversa_id: str
     message: str

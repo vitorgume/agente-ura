@@ -1,10 +1,12 @@
 from sqlalchemy import Column, String
-from src.infrastructure.config.database import Base
+from src.config.database import Base
+from sqlalchemy.orm import relationship
 
-class Conversa(Base):
+class ConversaEntity(Base):
     __tablename__ = "conversas_agente"
 
     id = Column(String(255), primary_key=True, index=True)
-    responsavel = Column(String(255))
-    conteudo = Column(String(2000))
-    conversa_id = Column(String(255))
+    cliente_id = Column(String(255), nullable=False)
+
+    # Relacionamento com mensagens
+    mensagens = relationship("MensagemConversaEntity", back_populates="conversa", cascade="all, delete-orphan")
