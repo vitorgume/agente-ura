@@ -3,15 +3,14 @@ from src.domain.mensagem_conversa import MensagemConversa
 
 
 class MensagemConversaMapper:
-    
+
     def paraEntity(self, mensagem: MensagemConversa) -> MensagemConversaEntity:
-        mensagemConversaEntity = MensagemConversaEntity(
-            mensagem.id,
-            mensagem.responsavel,
-            mensagem.conteudo,
-            mensagem.conversa_id
-        )
-        return mensagemConversaEntity
+        entidade = MensagemConversaEntity()
+        entidade.id = mensagem.id
+        entidade.responsavel = mensagem.responsavel
+        entidade.conteudo = mensagem.conteudo
+        entidade.conversa_id = mensagem.conversa_id
+        return entidade
     
     def paraDomain(self, mensagemConversaEntity: MensagemConversaEntity) -> MensagemConversa:
         mensagemConversa = MensagemConversa(

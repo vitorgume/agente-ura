@@ -1,33 +1,26 @@
-from src.domain.mensagem_conversa import MensagemConversa
+from openai import OpenAI
 from src.config.secrets import OPENAI_API_KEY
-import openai
+import logging
 
-openai.api_key = OPENAI_API_KEY
+from src.infrastructure.exceptions.data_provider_exception import DataProviderException
+
+logger = logging.getLogger(__name__)
+
+client = OpenAI(api_key=OPENAI_API_KEY)
+
 
 class AgenteDataProvider:
-    
-    def enviar_mensagem(self, mensagem: str, mensagens: list[MensagemConversa]) -> str:
-         # Constrói o histórico no formato da OpenAI
-        historico = [
-            {
-                "role": "system",
-                "content": "Você é um atendente virtual da URA, cordial, direto e prestativo. Sempre responda de forma clara, curta e objetiva. Caso não saiba algo, peça que a pessoa aguarde para ser redirecionada ao suporte humano."
-            }
-        ]
 
-        # Adiciona o histórico da conversa
-        for m in mensagens:
-            role = "user" if m.responsavel == "usuario" else "assistant"
-            historico.append({"role": role, "content": m.conteudo})
+    mensagem_erro_enviar_mensagem_ia = "Erro ao enviar mensagem a IA."
 
-        # Adiciona a nova mensagem do usuário
-        historico.append({"role": "user", "content": mensagem})
+    def enviar_mensagem(self, historico) -> str:
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=historico
+            )
+        except Exception as e:
+            logger.exception(self.mensagem_erro_enviar_mensagem_ia)
+            raise DataProviderException(self.mensagem_erro_enviar_mensagem_ia)
 
-        # Chama o modelo
-        response = openai.ChatCompletion.create(
-            model="gpt-4",  # ou "gpt-3.5-turbo"
-            messages=historico
-        )
-
-        # Retorna a resposta gerada
-        return response["choices"][0]["message"]["content"]
+        return response.choices[0].message.content

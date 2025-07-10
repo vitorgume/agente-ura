@@ -11,7 +11,6 @@ from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvi
 
 app = FastAPI()
 
-# Instanciando dependências
 mensagem_conversa_mapper = MensagemConversaMapper()
 conversa_mapper = ConversaMapper(mensagem_conversa_mapper)
 

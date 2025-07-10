@@ -17,8 +17,9 @@ class ConversaDataProvider:
         session = SessionLocal()
         conversa_entity = self.conversa_mapper.paraEntity(conversa)
         try:
-            session.merge(conversa_entity) 
+            persisted_entity = session.merge(conversa_entity)
             session.commit()
+            return self.conversa_mapper.paraDomain(persisted_entity)
         except Exception as e:
             session.rollback()
             logger.exception("Erro ao salvar conversa no banco de dados")

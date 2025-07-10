@@ -4,22 +4,20 @@ from src.domain.conversa import Conversa
 
 
 class ConversaMapper:
-    
+
     def __init__(self, mensagem_conversa_mapper: MensagemConversaMapper):
         self.mensagem_conversa_mapper = mensagem_conversa_mapper
-    
+
     def paraEntity(self, conversa: Conversa) -> ConversaEntity:
-        conversaEntity = ConversaEntity(
-            conversa.id,
-            list(map(self.mensagem_conversa_mapper.paraEntity, conversa.mensagens)),
-            conversa.cliente_id
+        return ConversaEntity(
+            id=conversa.id,
+            cliente_id=conversa.cliente_id,
+            mensagens=[self.mensagem_conversa_mapper.paraEntity(m) for m in conversa.mensagens]
         )
-        return conversaEntity
-    
+
     def paraDomain(self, conversa_entity: ConversaEntity) -> Conversa:
-        conversa = Conversa(
-            conversa_entity.id,
-            list(map(self.mensagem_conversa_mapper.paraDomain, conversa_entity.mensagens)),
-            conversa_entity.cliente_id
+        return Conversa(
+            id=conversa_entity.id,
+            cliente_id=conversa_entity.cliente_id,
+            mensagens=[self.mensagem_conversa_mapper.paraDomain(m) for m in conversa_entity.mensagens]
         )
-        return conversa
