@@ -9,6 +9,11 @@ from src.application.usecase.conversa_use_case import ConversaUseCase
 from src.infrastructure.dataprovider.conversa_data_provider import ConversaDataProvider
 from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvider
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+
 app = FastAPI()
 
 mensagem_conversa_mapper = MensagemConversaMapper()

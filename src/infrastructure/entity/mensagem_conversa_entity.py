@@ -1,6 +1,7 @@
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from src.config.database import Base
+from datetime import datetime
 
 class MensagemConversaEntity(Base):
     __tablename__ = "mensagens_conversa"
@@ -9,6 +10,7 @@ class MensagemConversaEntity(Base):
     responsavel = Column(String(50), nullable=False)  # 'usuario' ou 'agente'
     conteudo = Column(String(2000), nullable=False)
     conversa_id = Column(String(255), ForeignKey("conversas_agente.id"), nullable=False)
+    data = Column(DateTime, default=datetime.utcnow)
 
     # Relacionamento reverso
     conversa = relationship("ConversaEntity", back_populates="mensagens")

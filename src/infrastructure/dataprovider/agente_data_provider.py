@@ -41,7 +41,7 @@ class AgenteDataProvider:
                 segmento=data["qualificacao"]["segmento"],
                 regiao=data["qualificacao"]["regiao"]
             )
-            return MensagemAgente(resposta=data["resposta"], qualificao=qualificacao)
+            return MensagemAgente(resposta=data["resposta"], qualificacao=qualificacao)
 
         except Exception as e:
             logger.exception("Erro ao enviar mensagem à IA: %s", e)

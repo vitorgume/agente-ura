@@ -1,4 +1,4 @@
-
+from datetime import datetime
 from dataclasses import dataclass
 
 
@@ -8,3 +8,4 @@ class MensagemConversa:
     responsavel: str
     conteudo: str
     conversa_id: str
+    data: datetime

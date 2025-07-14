@@ -1,4 +1,6 @@
 import uuid
+import datetime
+
 from src.domain.mensagem import Mensagem
 from src.application.usecase.conversa_use_case import ConversaUseCase
 from src.application.usecase.agente_use_case import AgenteUseCase
@@ -27,14 +29,16 @@ class MensagemUseCase:
             id=str(uuid.uuid4()),
             responsavel="agente",
             conteudo=respostaAgente.resposta,
-            conversa_id=conversa.id
+            conversa_id=conversa.id,
+            data=datetime.datetime.now()
         )
 
         mensagem_usuario = MensagemConversa(
             id=str(uuid.uuid4()),
             responsavel="usuario",
             conteudo=mensagem.message,
-            conversa_id=conversa.id
+            conversa_id=conversa.id,
+            data=datetime.datetime.now()
         )
 
         conversa.mensagens.append(mensagem_usuario)

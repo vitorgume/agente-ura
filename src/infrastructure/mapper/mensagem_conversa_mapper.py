@@ -10,6 +10,7 @@ class MensagemConversaMapper:
         entidade.responsavel = mensagem.responsavel
         entidade.conteudo = mensagem.conteudo
         entidade.conversa_id = mensagem.conversa_id
+        entidade.data = mensagem.data
         return entidade
     
     def paraDomain(self, mensagemConversaEntity: MensagemConversaEntity) -> MensagemConversa:
@@ -17,6 +18,7 @@ class MensagemConversaMapper:
             mensagemConversaEntity.id,
             mensagemConversaEntity.responsavel,
             mensagemConversaEntity.conteudo,
-            mensagemConversaEntity.conversa_id
+            mensagemConversaEntity.conversa_id,
+            mensagemConversaEntity.data
         )
         return mensagemConversa
