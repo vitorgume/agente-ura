@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
+from src.domain.qualificacao_agente import QualificacaoAgente
+
 
 @dataclass
 class MensagemAgente:
-    user_id: str
-    conversa_id: str
-    message: str
+    resposta: str
+    qualificacao: QualificacaoAgente

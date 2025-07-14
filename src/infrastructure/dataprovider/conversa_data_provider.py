@@ -32,7 +32,7 @@ class ConversaDataProvider:
         try:
             return self.conversa_mapper.paraDomain(session.query(ConversaEntity).filter(ConversaEntity.id == id).first())
         except SQLAlchemyError as e:
-            logger.exception("Erro ao consultar conversa no banco de dados")
+            logger.exception("Erro ao consultar conversa no banco de dados %s", e)
             raise DataProviderException("Erro ao consultar conversa")
         finally:
             session.close()

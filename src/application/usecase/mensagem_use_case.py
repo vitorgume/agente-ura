@@ -2,6 +2,7 @@ import uuid
 from src.domain.mensagem import Mensagem
 from src.application.usecase.conversa_use_case import ConversaUseCase
 from src.application.usecase.agente_use_case import AgenteUseCase
+from src.domain.mensagem_agente import MensagemAgente
 from src.domain.mensagem_conversa import MensagemConversa
 import logging
 
@@ -13,7 +14,7 @@ class MensagemUseCase:
         self.conversa_use_case = conversa_use_case
         self.agente_use_case = agente_use_case
 
-    def processar_mensagem(self, mensagem: Mensagem):
+    def processar_mensagem(self, mensagem: Mensagem) -> MensagemAgente:
         logger.info("Processando nova mensagem. Mensagem: %s", mensagem)
 
         conversa = self.conversa_use_case.consulta_por_id(mensagem.conversa_id)
@@ -25,7 +26,7 @@ class MensagemUseCase:
         resposta_agente = MensagemConversa(
             id=str(uuid.uuid4()),
             responsavel="agente",
-            conteudo=respostaAgente,
+            conteudo=respostaAgente.resposta,
             conversa_id=conversa.id
         )
 

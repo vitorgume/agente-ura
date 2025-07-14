@@ -30,4 +30,4 @@ mensagem_use_case = MensagemUseCase(
 def chat_endpoint(msg: MensagemDto):
     mensagem_domain = mensagem_mapper.paraDomain(msg)
     resposta = mensagem_use_case.processar_mensagem(mensagem_domain)
-    return {"resposta": resposta}
+    return resposta
