@@ -1,3 +1,5 @@
+import uuid
+
 from src.infrastructure.entity.conversa_entity import ConversaEntity
 from src.infrastructure.mapper.conversa_mapper import ConversaMapper
 from src.domain.conversa import Conversa
@@ -26,11 +28,13 @@ class ConversaDataProvider:
             raise DataProviderException("Erro ao salvar conversa")
         finally:
             session.close()
-    
+
     def consulta_por_id(self, id: str) -> Conversa:
         session = SessionLocal()
         try:
-            return self.conversa_mapper.paraDomain(session.query(ConversaEntity).filter(ConversaEntity.id == id).first())
+            uuid_bytes = uuid.UUID(id).bytes
+            entity = session.query(ConversaEntity).filter(ConversaEntity.id_conversa == uuid_bytes).first()
+            return self.conversa_mapper.paraDomain(entity)
         except SQLAlchemyError as e:
             logger.exception("Erro ao consultar conversa no banco de dados %s", e)
             raise DataProviderException("Erro ao consultar conversa")

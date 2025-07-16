@@ -7,3 +7,8 @@ class Conversa:
     id: str
     cliente_id: str
     mensagens: list[MensagemConversa]
+    data_criacao: str
+    finalizada: bool
+    inativa: bool
+    cliente_id_cliente: str
+    vendedor_id_vendedor: str
