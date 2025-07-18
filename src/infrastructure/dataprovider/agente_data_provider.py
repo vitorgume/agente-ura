@@ -39,8 +39,10 @@ class AgenteDataProvider:
                 qualificado=data["qualificacao"]["qualificado"],
                 nome=data["qualificacao"]["nome"],
                 segmento=data["qualificacao"]["segmento"],
-                regiao=data["qualificacao"]["regiao"]
+                regiao=data["qualificacao"]["regiao"],
+                descricao_material=data["qualificacao"]["descricao_material"]
             )
+
             return MensagemAgente(resposta=data["resposta"], qualificacao=qualificacao)
 
         except Exception as e:

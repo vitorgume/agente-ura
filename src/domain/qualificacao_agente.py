@@ -6,3 +6,4 @@ class QualificacaoAgente:
     nome: str
     segmento: int
     regiao: int
+    descricao_material: str
