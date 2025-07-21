@@ -19,8 +19,9 @@ class AgenteDataProvider:
     def enviar_mensagem(self, historico) -> MensagemAgente:
         try:
             response = client.chat.completions.create(
-                model="gpt-4",
-                messages=historico
+                model="gpt-3.5-turbo",
+                messages=historico,
+                temperature = 0
             )
             content = response.choices[0].message.content
             logger.info("Resposta bruta da IA: %s", content)
