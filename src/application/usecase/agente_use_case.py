@@ -1,8 +1,8 @@
-from src.domain.conversa import Conversa
-from src.domain.mensagem_agente import MensagemAgente
-from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvider
-from pathlib import Path
 import logging
+from pathlib import Path
+
+from src.domain.conversa import Conversa
+from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvider
 
 logger = logging.getLogger(__name__)
 
@@ -12,11 +12,11 @@ class AgenteUseCase:
         self.agente_data_provider = agente_data_provider
 
     def _carregar_prompt_padrao(self) -> str:
-        caminho = Path("src/resources/system_prompt.txt")
+        caminho = Path("src/resources/system_prompt_agent_chat.txt")
         with open(caminho, "r", encoding="utf-8") as file:
             return file.read()
 
-    def processar(self, mensagem: str, conversa: Conversa) -> MensagemAgente:
+    def processar(self, mensagem: str, conversa: Conversa) -> str:
         logger.info("Processando mensagem para o agente. Mensagem: %s Conversa: %s", mensagem, conversa)
 
         historico = [

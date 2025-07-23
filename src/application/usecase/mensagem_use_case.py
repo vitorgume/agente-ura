@@ -16,19 +16,19 @@ class MensagemUseCase:
         self.conversa_use_case = conversa_use_case
         self.agente_use_case = agente_use_case
 
-    def processar_mensagem(self, mensagem: Mensagem) -> MensagemAgente:
+    def processar_mensagem(self, mensagem: Mensagem) -> str:
         logger.info("Processando nova mensagem. Mensagem: %s", mensagem)
 
         conversa = self.conversa_use_case.consulta_por_id(mensagem.conversa_id)
 
         logger.info("Enviando mensagem para o agente. Mensagem: %s Conversa: %s", mensagem, conversa)
 
-        respostaAgente = self.agente_use_case.processar(mensagem.message, conversa)
+        resposta = self.agente_use_case.processar(mensagem.message, conversa)
         
         resposta_agente = MensagemConversa(
             id=str(uuid.uuid4()),
             responsavel="agente",
-            conteudo=respostaAgente.resposta,
+            conteudo=resposta,
             conversa_id=conversa.id,
             data=datetime.datetime.now()
         )
@@ -45,6 +45,6 @@ class MensagemUseCase:
         conversa.mensagens.append(resposta_agente)
         conversa = self.conversa_use_case.atualiza(conversa)
 
-        logger.info("Mensagem processada com sucesso. Resposta agente: %s Mensagem usuário: %s Conversa: %s", resposta_agente, mensagem_usuario, conversa)
+        logger.info("Mensagem processada com sucesso. Resposta agente: %s Mensagem usuário: %s Conversa: %s", resposta, mensagem_usuario, conversa)
 
-        return respostaAgente
+        return resposta

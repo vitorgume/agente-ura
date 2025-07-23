@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+
+from src.application.usecase.json_use_case import JsonUseCase
+from src.entrypoint.controller.dto.mensagem_json_dto import MensagemJsonDto
 from src.infrastructure.mapper.conversa_mapper import ConversaMapper
 from src.infrastructure.mapper.mensagem_conversa_mapper import MensagemConversaMapper
 from src.entrypoint.controller.mapper.mensagem_mapper import MensagemMapper
@@ -31,8 +34,18 @@ mensagem_use_case = MensagemUseCase(
     agente_use_case=agente_use_case
 )
 
+json_use_case = JsonUseCase(
+    agente_data_provider=agente_data_provider
+)
+
 @app.post("/chat")
-def chat_endpoint(msg: MensagemDto):
+def enviar_mensagem_chat(msg: MensagemDto):
     mensagem_domain = mensagem_mapper.paraDomain(msg)
     resposta = mensagem_use_case.processar_mensagem(mensagem_domain)
+    return resposta
+
+
+@app.post("/chat/json")
+def estrutura_json_usuario(msg: MensagemJsonDto):
+    resposta = json_use_case.transformar(msg.mensagem)
     return resposta

@@ -13,15 +13,14 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 class AgenteDataProvider:
-
     mensagem_erro_enviar_mensagem_ia = "Erro ao enviar mensagem a IA."
 
-    def enviar_mensagem(self, historico) -> MensagemAgente:
+    def enviar_mensagem(self, historico) -> str:
         try:
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=historico,
-                temperature = 0
+                temperature=0
             )
             content = response.choices[0].message.content
             logger.info("Resposta bruta da IA: %s", content)
@@ -30,21 +29,22 @@ class AgenteDataProvider:
                 logger.error("Resposta vazia da IA.")
                 raise DataProviderException("Resposta da IA vazia.")
 
-            try:
-                data = json.loads(content)
-            except json.JSONDecodeError as e:
-                logger.error("Erro de JSON: %s", content)
-                raise DataProviderException("Resposta da IA não é um JSON válido.")
+            return content
 
-            qualificacao = QualificacaoAgente(
-                qualificado=data["qualificacao"]["qualificado"],
-                nome=data["qualificacao"]["nome"],
-                segmento=data["qualificacao"]["segmento"],
-                regiao=data["qualificacao"]["regiao"],
-                descricao_material=data["qualificacao"]["descricao_material"]
+        except Exception as e:
+            logger.exception("Erro ao enviar mensagem à IA: %s", e)
+            raise DataProviderException(self.mensagem_erro_enviar_mensagem_ia)
+
+    def enviar_mensagem_trasformacao_json(self, historico):
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=historico,
+                temperature=0
             )
+            content = response.choices[0].message.content
 
-            return MensagemAgente(resposta=data["resposta"], qualificacao=qualificacao)
+            return content
 
         except Exception as e:
             logger.exception("Erro ao enviar mensagem à IA: %s", e)
