@@ -19,7 +19,7 @@ class AgenteDataProvider:
     def enviar_mensagem(self, historico) -> MensagemAgente:
         try:
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4",
                 messages=historico,
                 temperature = 0
             )
