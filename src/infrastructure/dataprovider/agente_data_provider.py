@@ -1,10 +1,8 @@
-from openai import OpenAI
-from src.config.secrets import OPENAI_API_KEY
 import logging
-import json
 
-from src.domain.mensagem_agente import MensagemAgente
-from src.domain.qualificacao_agente import QualificacaoAgente
+from openai import OpenAI
+
+from src.config.secrets import OPENAI_API_KEY
 from src.infrastructure.exceptions.data_provider_exception import DataProviderException
 
 logger = logging.getLogger(__name__)
@@ -22,6 +20,7 @@ class AgenteDataProvider:
                 messages=historico,
                 temperature=0
             )
+
             content = response.choices[0].message.content
             logger.info("Resposta bruta da IA: %s", content)
 
@@ -42,6 +41,7 @@ class AgenteDataProvider:
                 messages=historico,
                 temperature=0
             )
+
             content = response.choices[0].message.content
 
             return content
