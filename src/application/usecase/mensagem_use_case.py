@@ -4,7 +4,6 @@ import datetime
 from src.domain.mensagem import Mensagem
 from src.application.usecase.conversa_use_case import ConversaUseCase
 from src.application.usecase.agente_use_case import AgenteUseCase
-from src.domain.mensagem_agente import MensagemAgente
 from src.domain.mensagem_conversa import MensagemConversa
 import logging
 

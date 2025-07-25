@@ -1,10 +1,9 @@
-from sqlalchemy import Column, String, DateTime, Boolean, BigInteger, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, DateTime, Boolean, BigInteger, ForeignKey
 from sqlalchemy.dialects.mysql import BINARY
+from sqlalchemy.orm import relationship
+
 from src.config.database import Base
-from src.infrastructure.entity.mensagem_conversa_entity import MensagemConversaEntity
-from src.infrastructure.entity.vendedor_entity import VendedorEntity
-from src.infrastructure.entity.cliente_entity import ClienteEntity
+
 
 class ConversaEntity(Base):
     __tablename__ = "conversas_agente"

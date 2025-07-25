@@ -1,3 +1,6 @@
-class ConversaNaoEncontradaException:
-    def __init__(self):
-        super().__init__(f"Conversa não encontrada pelo seu id.")
+class ConversaNaoEncontradaException(Exception):
+    def __init__(self, message: str = "Conversa não encontrada pelo seu id."):
+        super().__init__(message)
+
+
+

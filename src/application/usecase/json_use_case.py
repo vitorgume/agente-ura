@@ -1,5 +1,5 @@
-from pathlib import Path
 import logging
+from pathlib import Path
 
 from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvider
 
