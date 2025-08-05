@@ -2,7 +2,7 @@ import pytest
 
 from src.domain.mensagem import Mensagem
 from src.entrypoint.controller.dto.mensagem_dto import MensagemDto
-from src.entrypoint.controller.mapper.mensagem_mapper import MensagemMapper
+from src.entrypoint.mapper.mensagem_mapper import MensagemMapper
 
 
 @pytest.fixture
