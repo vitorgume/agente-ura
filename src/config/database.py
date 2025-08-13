@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-
-DATABASE_URL = "mysql+pymysql://root:root@localhost:3306/neoprint-ura"
+from src.config.secrets import DATABASE_URL
 
 engine = create_engine(
     DATABASE_URL,
