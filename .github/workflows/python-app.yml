@@ -1,0 +1,181 @@
+name: CI/CD - Agente (Python/FastAPI)
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*" ]         # releases semânticas opcionais
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write   # OIDC para AWS (sem guardar chaves)
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'api-agente' }}
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  test:
+    name: Testes (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # garante pytest se não estiver em requirements
+          pip install -U pytest
+
+      - name: Rodar testes
+        run: |
+          pytest -q
+
+  build_and_push:
+    name: Build & Push para ECR
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'   # só em push (PR roda apenas testes)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Autentica na AWS via OIDC (recomendado)
+      - name: Configurar credenciais AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # (Opcional) cria o repo no ECR se não existir
+      - name: Garantir repositório no ECR
+        shell: bash
+        run: |
+          set -e
+          if ! aws ecr describe-repositories --repository-names "${ECR_REPOSITORY}" >/dev/null 2>&1; then
+            aws ecr create-repository --repository-name "${ECR_REPOSITORY}" >/dev/null
+            echo "Repositório ${ECR_REPOSITORY} criado."
+          else
+            echo "Repositório ${ECR_REPOSITORY} já existe."
+          fi
+
+      - name: Login no ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Definir metadados de imagem (tags)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}
+          tags: |
+            type=sha
+            type=ref,event=tag
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & Push (Docker)
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          # App Runner usa x86_64; manter amd64
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy_apprunner:
+    name: Deploy no App Runner
+    runs-on: ubuntu-latest
+    needs: build_and_push
+    if: github.event_name == 'push' && (secrets.APP_RUNNER_SERVICE_ARN != '')
+    steps:
+      - name: Configurar credenciais AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login no ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Descobrir última imagem (preferência: tag por SHA na main)
+        id: resolve-image
+        shell: bash
+        run: |
+          set -e
+          REG="${{ steps.login-ecr.outputs.registry }}"
+          REPO="${{ env.ECR_REPOSITORY }}"
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            TAG="${GITHUB_SHA}"
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG="${GITHUB_SHA}"
+          fi
+          echo "IMAGE=${REG}/${REPO}:${TAG}" >> $GITHUB_OUTPUT
+          echo "Usando imagem: ${REG}/${REPO}:${TAG}"
+
+      - name: Atualizar serviço App Runner
+        id: update
+        shell: bash
+        env:
+          SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+          IMAGE: ${{ steps.resolve-image.outputs.IMAGE }}
+        run: |
+          set -e
+          OUT=$(aws apprunner update-service \
+            --service-arn "$SERVICE_ARN" \
+            --source-configuration "{
+              \"ImageRepository\": {
+                \"ImageIdentifier\": \"${IMAGE}\",
+                \"ImageRepositoryType\": \"ECR\"
+              }
+            }")
+          OP_ID=$(echo "$OUT" | jq -r '.OperationId')
+          echo "OPERATION_ID=$OP_ID" >> $GITHUB_OUTPUT
+          echo "OperationId: $OP_ID"
+
+      - name: Aguardar conclusão do deploy
+        shell: bash
+        env:
+          SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+          OPERATION_ID: ${{ steps.update.outputs.OPERATION_ID }}
+        run: |
+          set -e
+          echo "Aguardando operação concluir..."
+          for i in {1..60}; do
+            STATUS=$(aws apprunner describe-operation --service-arn "$SERVICE_ARN" --operation-id "$OPERATION_ID" | jq -r '.OperationStatus')
+            echo "Status: $STATUS"
+            if [[ "$STATUS" == "SUCCEEDED" ]]; then
+              echo "Deploy concluído com sucesso."
+              exit 0
+            elif [[ "$STATUS" == "FAILED" ]]; then
+              echo "Deploy falhou."
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "Timeout ao aguardar deploy."
+          exit 1
