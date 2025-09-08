@@ -104,78 +104,34 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy_apprunner:
-    name: Deploy no App Runner
+  deploy_ecs:
+    name: Deploy ECS Service
     runs-on: ubuntu-latest
     needs: build_and_push
-    if: github.event_name == 'push' && (secrets.APP_RUNNER_SERVICE_ARN != '')
+    if: github.event_name == 'push'
     steps:
-      - name: Configurar credenciais AWS (OIDC)
+      - uses: actions/checkout@v4
+
+      - name: AWS creds (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login no ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      # Renderiza a task definition trocando a imagem do container
+      - name: Render taskdef com nova imagem
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs-taskdef.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
-      - name: Descobrir última imagem (preferência: tag por SHA na main)
-        id: resolve-image
-        shell: bash
-        run: |
-          set -e
-          REG="${{ steps.login-ecr.outputs.registry }}"
-          REPO="${{ env.ECR_REPOSITORY }}"
-          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            TAG="${GITHUB_SHA}"
-          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            TAG="${GITHUB_REF#refs/tags/}"
-          else
-            TAG="${GITHUB_SHA}"
-          fi
-          echo "IMAGE=${REG}/${REPO}:${TAG}" >> $GITHUB_OUTPUT
-          echo "Usando imagem: ${REG}/${REPO}:${TAG}"
-
-      - name: Atualizar serviço App Runner
-        id: update
-        shell: bash
-        env:
-          SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-          IMAGE: ${{ steps.resolve-image.outputs.IMAGE }}
-        run: |
-          set -e
-          OUT=$(aws apprunner update-service \
-            --service-arn "$SERVICE_ARN" \
-            --source-configuration "{
-              \"ImageRepository\": {
-                \"ImageIdentifier\": \"${IMAGE}\",
-                \"ImageRepositoryType\": \"ECR\"
-              }
-            }")
-          OP_ID=$(echo "$OUT" | jq -r '.OperationId')
-          echo "OPERATION_ID=$OP_ID" >> $GITHUB_OUTPUT
-          echo "OperationId: $OP_ID"
-
-      - name: Aguardar conclusão do deploy
-        shell: bash
-        env:
-          SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-          OPERATION_ID: ${{ steps.update.outputs.OPERATION_ID }}
-        run: |
-          set -e
-          echo "Aguardando operação concluir..."
-          for i in {1..60}; do
-            STATUS=$(aws apprunner describe-operation --service-arn "$SERVICE_ARN" --operation-id "$OPERATION_ID" | jq -r '.OperationStatus')
-            echo "Status: $STATUS"
-            if [[ "$STATUS" == "SUCCEEDED" ]]; then
-              echo "Deploy concluído com sucesso."
-              exit 0
-            elif [[ "$STATUS" == "FAILED" ]]; then
-              echo "Deploy falhou."
-              exit 1
-            fi
-            sleep 10
-          done
-          echo "Timeout ao aguardar deploy."
-          exit 1
+      # Faz deploy criando nova revision e atualizando o service
+      - name: Deploy ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
