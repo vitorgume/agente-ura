@@ -5,7 +5,8 @@ from unittest.mock import Mock
 import pytest
 
 from src.domain.conversa import Conversa
-from src.infrastructure.entity.conversa_entity import ConversaEntity, MensagemConversaEntity
+from src.infrastructure.entity.conversa_entity import ConversaEntity
+from src.infrastructure.entity.mensagem_conversa_entity import MensagemConversaEntity
 from src.infrastructure.mapper.conversa_mapper import ConversaMapper
 from src.infrastructure.mapper.mensagem_conversa_mapper import MensagemConversaMapper
 
