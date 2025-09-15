@@ -23,7 +23,7 @@ API responsável pela lógica de agente conversacional
 
 ### Estilo arquitetural
 
-- **Clean Architecture** (camadas: EntryPoint → Application → Infrastructure → Domain). O diagrama de camadas está no repositório (veja `docs/arquitetura.png`).
+- **Clean Architecture** (camadas: EntryPoint → Application → Infrastructure → Domain). O diagrama de camadas está no repositório (veja `docs/arquitetura.jpg`).
 
 **EntryPoint**
 
@@ -49,7 +49,7 @@ API responsável pela lógica de agente conversacional
 > Dica visual rápida:
 > 
 
-![arquitetura](docs/arquitetura.png)
+![arquitetura](docs/arquitetura.jpg)
 
 ---
 
