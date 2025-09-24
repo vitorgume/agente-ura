@@ -2,7 +2,7 @@ import logging
 
 from openai import OpenAI
 
-from src.config.secrets import OPENAI_API_KEY
+from src.config.settings import OPENAI_API_KEY
 from src.infrastructure.exceptions.data_provider_exception import DataProviderException
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class AgenteDataProvider:
     def enviar_mensagem(self, historico) -> str:
         try:
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4-turbo",
                 messages=historico,
                 temperature=0
             )
