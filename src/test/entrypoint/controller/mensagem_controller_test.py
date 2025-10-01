@@ -1,23 +1,31 @@
+# tests/test_mensagem_controller.py
 import pytest
+from types import SimpleNamespace
 from fastapi.testclient import TestClient
 
-import src.entrypoint.controller.mensagem_controller as app_module
+import src.app as app_module
+from src.entrypoint.controller.mensagem_controller import (
+    get_mensagem_use_case, get_json_use_case
+)
 
 @pytest.fixture(autouse=True)
-def client(monkeypatch):
-    monkeypatch.setattr(
-        app_module.mensagem_use_case,
-        "processar_mensagem",
-        lambda mensagem_domain: {"reply": f"Echo: {mensagem_domain.message}"}
-    )
+def client():
+    app = app_module.app
 
-    monkeypatch.setattr(
-        app_module.json_use_case,
-        "transformar",
-        lambda s: {"json": s.upper()}
-    )
+    # Stubs
+    fake_msg_uc  = SimpleNamespace(processar_mensagem=lambda md: {"reply": f"Echo: {md.message}"})
+    fake_json_uc = SimpleNamespace(transformar=lambda s: {"json": s.upper()})
 
-    return TestClient(app_module.app)
+    # Override
+    app.dependency_overrides[get_mensagem_use_case] = lambda: fake_msg_uc
+    app.dependency_overrides[get_json_use_case]     = lambda: fake_json_uc
+
+    try:
+        yield TestClient(app)
+    finally:
+        app.dependency_overrides.clear()
+
+
 
 def test_chat_endpoint_success(client):
     payload = {
