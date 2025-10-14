@@ -18,12 +18,14 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
     - Segmento (obrigatório): Segmento coletado do cliente
     - Região (obrigatório): Região de atuação coletado do cliente
     - Descrição material: Trazer uma breve descrição do material que o cliente precisa fazer
+    - Endereço real: Endereço que o cliente forneceu
 
 {
 "nome": "{Nome do cliente}",
 "segmento": {Segmento do cliente},
 "regiao": {Região do cliente},
 "descricao_material": {Descrição da necessidade do cliente}
+"endereco_real": {O endereço realmente fornecido pelo cliente}
 
 }
 
@@ -36,7 +38,8 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 "nome": "{Nome do cliente}",
 "segmento": 0,
 "regiao": 0,
-"descricao_material": "
+"descricao_material": "",
+"endereco_real": ""
 }
 
 ## Regras para preenchimento de “segmento” em JSON resultado (obrigatório)
@@ -75,7 +78,20 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 "nome": "",
 "segmento": 0,
 "regiao": 0,
-"descricao_material": "{Descrição do material}"
+"descricao_material": "{Descrição do material}",
+"endereco_real": ""
+}
+
+## Regras para preenchimento de "endereco_real" em JSON resultado (obrigatório)
+
+1. Identificar qual foi o endereço que o cliente forneceu, onde antes você qualificou dentro das regiões, agora basta preencher com esse endereço.
+
+{
+"nome": "",
+"segmento": 0,
+"regiao": 0,
+"descricao_material": "",
+"endereco_real": "{Endereço real}"
 }
 
 ## Instruções de fluxo
@@ -89,6 +105,7 @@ O fluxo consiste em receber um texto com todas as informações já coletadas do
 "segmento": numerico,
 "regiao": numerico,
 "descricao_material": string
+"endereco_real": string
 }
 
 # Mais exemplos
@@ -110,6 +127,8 @@ O usuário se chama Vitor, a empresa dele atua em São Paulo, é do segmento de 
 “segmento”: 2,
 
 “descricao_material”: “50 sacolas tradicionais”
+
+"endereco_real": "São Paulo"
 
 }
 
