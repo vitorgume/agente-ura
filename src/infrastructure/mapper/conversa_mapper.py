@@ -14,7 +14,6 @@ class ConversaMapper:
             id_conversa=uuid.UUID(conversa.id).bytes,
             data_criacao=conversa.data_criacao,
             finalizada=conversa.finalizada,
-            inativa=conversa.inativa,
             cliente_id_cliente=uuid.UUID(conversa.cliente_id_cliente).bytes if conversa.cliente_id_cliente else None,
             vendedor_id_vendedor=int(conversa.vendedor_id_vendedor) if conversa.vendedor_id_vendedor else None,
             mensagens=[self.mensagem_conversa_mapper.paraEntity(m) for m in conversa.mensagens]
@@ -25,7 +24,6 @@ class ConversaMapper:
             id=str(uuid.UUID(bytes=conversa_entity.id_conversa)),
             data_criacao=conversa_entity.data_criacao.isoformat() if conversa_entity.data_criacao else None,
             finalizada=conversa_entity.finalizada,
-            inativa=conversa_entity.inativa,
             cliente_id_cliente=str(uuid.UUID(bytes=conversa_entity.cliente_id_cliente)) if conversa_entity.cliente_id_cliente else None,
             vendedor_id_vendedor=str(conversa_entity.vendedor_id_vendedor) if conversa_entity.vendedor_id_vendedor else None,
             cliente_id=str(uuid.UUID(bytes=conversa_entity.cliente_id_cliente)) if conversa_entity.cliente_id_cliente else None,
