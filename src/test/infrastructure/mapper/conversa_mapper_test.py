@@ -28,7 +28,6 @@ def make_conversa():
         id=str(uuid.uuid4()),
         data_criacao=datetime.datetime(2025,7,25,12,0,0),
         finalizada=False,
-        inativa=False,
         cliente_id_cliente=cid,
         vendedor_id_vendedor="123",
         cliente_id=cid,
@@ -48,7 +47,6 @@ def test_para_domain(mensagem_mapper_mock, conversa_mapper):
         id_conversa=uuid.UUID(conversa.id).bytes,
         data_criacao=conversa.data_criacao,
         finalizada=conversa.finalizada,
-        inativa=conversa.inativa,
         cliente_id_cliente=uuid.UUID(conversa.cliente_id_cliente).bytes,
         vendedor_id_vendedor=int(conversa.vendedor_id_vendedor),
         mensagens=[dummy_msg, dummy_msg]
@@ -59,7 +57,6 @@ def test_para_domain(mensagem_mapper_mock, conversa_mapper):
     assert domain.id == conversa.id
     assert domain.data_criacao == conversa.data_criacao.isoformat()
     assert domain.finalizada == conversa.finalizada
-    assert domain.inativa == conversa.inativa
     assert domain.cliente_id_cliente == conversa.cliente_id_cliente
     assert domain.vendedor_id_vendedor == conversa.vendedor_id_vendedor
     assert domain.cliente_id == conversa.cliente_id
@@ -73,7 +70,6 @@ def make_conversa_entity(conversa):
         id_conversa=uuid.UUID(conversa.id).bytes,
         data_criacao=conversa.data_criacao,
         finalizada=conversa.finalizada,
-        inativa=conversa.inativa,
         cliente_id_cliente=uuid.UUID(conversa.cliente_id_cliente).bytes,
         vendedor_id_vendedor=int(conversa.vendedor_id_vendedor),
         mensagens=[mensagem_mapper_mock.paraEntity(None) for _ in conversa.mensagens]
