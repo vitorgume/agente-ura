@@ -2,9 +2,11 @@ import base64
 import logging
 import mimetypes
 import os
+import shutil
 import tempfile
 from pathlib import Path
 from urllib import request
+from urllib.parse import urlparse
 
 from openai import OpenAI
 
@@ -18,7 +20,8 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 class AgenteDataProvider:
     mensagem_erro_enviar_mensagem_ia = "Erro ao enviar mensagem a IA."
-    modelo_chat = "gpt-4o-mini"
+    modelo_chat = "gpt-4.1"
+    modelo_json = "gpt-4"
 
     def enviar_mensagem(self, historico) -> str:
         try:
@@ -44,7 +47,7 @@ class AgenteDataProvider:
     def enviar_mensagem_trasformacao_json(self, historico):
         try:
             response = client.chat.completions.create(
-                model="gpt-4",
+                model=self.modelo_json,
                 messages=historico,
                 temperature=0
             )
@@ -81,6 +84,7 @@ class AgenteDataProvider:
     def baixar_imagem_como_data_uri(self, imagem_url: str) -> str:
         caminho_tmp = None
         try:
+            print(f"Imagem url das imagens: {imagem_url}")
             caminho_tmp = self._baixar_arquivo_temporario(imagem_url, prefixo="imagem")
             with open(caminho_tmp, "rb") as image_file:
                 encoded = base64.b64encode(image_file.read()).decode("utf-8")
@@ -102,9 +106,23 @@ class AgenteDataProvider:
                     logger.warning("Falha ao remover arquivo temporario de imagem: %s", caminho_tmp)
 
     def _baixar_arquivo_temporario(self, url: str, prefixo: str) -> str:
-        extensao = Path(url).suffix
-        fd, caminho_tmp = tempfile.mkstemp(prefix=f"{prefixo}_", suffix=extensao if extensao else "")
+        parsed_url = urlparse(url)
+
+        # 1) tenta pegar a extensão direto do path
+        extensao = Path(parsed_url.path).suffix
+
+        # 2) se não tiver extensão nenhuma, tenta adivinhar pelo MIME
+        if not extensao:
+            mime, _ = mimetypes.guess_type(url)  # usa URL inteira, não só path
+            if mime:
+                extensao = mimetypes.guess_extension(mime) or ""
+            else:
+                # não conseguiu adivinhar: não chuta mais nada aqui pra não quebrar
+                extensao = ""
+
+        fd, caminho_tmp = tempfile.mkstemp(prefix=f"{prefixo}_", suffix=extensao)
         os.close(fd)
+
         logger.info("Baixando arquivo temporario de %s para %s", url, caminho_tmp)
         request.urlretrieve(url, caminho_tmp)
         return caminho_tmp

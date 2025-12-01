@@ -36,6 +36,7 @@ def enviar_mensagem_chat(
     msg: MensagemDto,
     use_case: MensagemUseCase = Depends(get_mensagem_use_case)
 ):
+    print(f"Mensagem do controller: {msg}")
     dom = mensagem_mapper.paraDomain(msg)
     return use_case.processar_mensagem(dom)
 

@@ -22,12 +22,12 @@ class MensagemUseCase:
 
         logger.info("Enviando mensagem para o agente. Mensagem: %s Conversa: %s", mensagem, conversa)
 
-        resposta, conteudo_usuario = self.agente_use_case.processar(mensagem, conversa)
+        resposta = self.agente_use_case.processar(mensagem.message, conversa)
 
         mensagem_usuario = MensagemConversa(
             id=str(uuid.uuid4()),
             responsavel="usuario",
-            conteudo=conteudo_usuario,
+            conteudo=mensagem.message,
             conversa_id=conversa.id,
             data=datetime.datetime.now()
         )
