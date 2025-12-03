@@ -32,7 +32,6 @@ def make_conversa():
         id=str(uuid.uuid4()),
         data_criacao=datetime.datetime(2025, 7, 25, 12, 0, 0),
         finalizada=False,
-        inativa=False,
         cliente_id_cliente=cid,
         vendedor_id_vendedor="123",
         cliente_id=cid,
@@ -45,7 +44,6 @@ def make_conversa_entity(domain: Conversa):
         id_conversa=uuid.UUID(domain.id).bytes,
         data_criacao=domain.data_criacao,
         finalizada=domain.finalizada,
-        inativa=domain.inativa,
         cliente_id_cliente=uuid.UUID(domain.cliente_id_cliente).bytes,
         vendedor_id_vendedor=int(domain.vendedor_id_vendedor),
         mensagens=[]
