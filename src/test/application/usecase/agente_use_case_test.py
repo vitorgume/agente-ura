@@ -4,6 +4,7 @@ import pytest
 
 from src.application.usecase.agente_use_case import AgenteUseCase
 from src.domain.conversa import Conversa
+from src.domain.mensagem import Mensagem
 from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvider
 
 
@@ -84,3 +85,56 @@ def test_processar_provedor_exception(monkeypatch, provider_mock, use_case):
     with pytest.raises(RuntimeError) as exc:
         use_case.processar("Teste de exceção", conversa)
     assert "falha no provider" in str(exc.value)
+
+
+def test_processar_com_objeto_mensagem(monkeypatch, provider_mock, use_case):
+    monkeypatch.setattr(use_case, "_carregar_prompt_padrao", lambda: "PROMPT")
+    monkeypatch.setattr(use_case, "_preparar_conteudo_usuario", lambda msg: (["conteudo-estruturado"], "historico"))
+
+    conversa = Mock(spec=Conversa)
+    conversa.mensagens = []
+    provider_mock.enviar_mensagem.return_value = "RETORNO"
+
+    mensagem = Mensagem(message="oi", conversa_id="conv-id")
+    retorno = use_case.processar(mensagem, conversa)
+
+    assert retorno == "RETORNO"
+    provider_mock.enviar_mensagem.assert_called_once_with([
+        {"role": "system", "content": "PROMPT"},
+        {"role": "user", "content": ["conteudo-estruturado"]},
+    ])
+
+
+def test_preparar_conteudo_usuario_com_midias(provider_mock, use_case):
+    provider_mock.transcrever_audio.side_effect = ["texto audio"]
+    provider_mock.baixar_imagem_como_data_uri.side_effect = ["data:image/png;base64,AAA"]
+
+    mensagem = Mensagem(
+        message="Ola",
+        conversa_id="c1",
+        audios_url=["http://audio/1.mp3", "  ", None],
+        imagens_url=["http://img/1.png", ""],
+    )
+
+    conteudo_modelo, conteudo_historico = use_case._preparar_conteudo_usuario(mensagem)
+
+    provider_mock.transcrever_audio.assert_called_once_with("http://audio/1.mp3")
+    provider_mock.baixar_imagem_como_data_uri.assert_called_once_with("http://img/1.png")
+
+    assert isinstance(conteudo_modelo, list)
+    assert conteudo_modelo[0]["type"] == "text"
+    assert "texto audio" in conteudo_modelo[0]["text"]
+    assert conteudo_modelo[1]["image_url"]["url"] == "data:image/png;base64,AAA"
+    assert "[1 imagem(ns) anexada(s)]" in conteudo_historico
+    assert "Transcricoes de audio" in conteudo_historico
+
+
+def test_preparar_conteudo_usuario_sem_conteudo(provider_mock, use_case):
+    mensagem = Mensagem(message="", conversa_id="c2")
+
+    conteudo_modelo, conteudo_historico = use_case._preparar_conteudo_usuario(mensagem)
+
+    provider_mock.transcrever_audio.assert_not_called()
+    provider_mock.baixar_imagem_como_data_uri.assert_not_called()
+    assert conteudo_modelo == "Responda ao usuario."
+    assert conteudo_historico == "Responda ao usuario."
