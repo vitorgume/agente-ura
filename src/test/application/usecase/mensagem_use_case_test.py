@@ -48,7 +48,7 @@ def test_processar_mensagem_success(conversa_use_case_mock, agente_use_case_mock
 
     assert result == "resposta do agente"
     conversa_use_case_mock.consulta_por_id.assert_called_once_with(conv.id)
-    agente_use_case_mock.processar.assert_called_once_with(msg.message, conv)
+    agente_use_case_mock.processar.assert_called_once_with(msg, conv)
 
     assert len(conv.mensagens) == 2
     user_msg, agent_msg = conv.mensagens

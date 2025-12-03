@@ -22,7 +22,8 @@ class MensagemUseCase:
 
         logger.info("Enviando mensagem para o agente. Mensagem: %s Conversa: %s", mensagem, conversa)
 
-        resposta = self.agente_use_case.processar(mensagem.message, conversa)
+        # Envia o objeto completo para permitir processamento de mídias (áudio/imagem).
+        resposta = self.agente_use_case.processar(mensagem, conversa)
 
         mensagem_usuario = MensagemConversa(
             id=str(uuid.uuid4()),

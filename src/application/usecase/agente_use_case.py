@@ -71,6 +71,8 @@ class AgenteUseCase:
             else:
                 texto_base = f"Transcricoes de audio:\n{bloco}"
 
+
+
         # --- IMAGENS ------------------------------------------------
         imagens_data_uri: List[str] = []
 
@@ -109,5 +111,7 @@ class AgenteUseCase:
                 conteudo_modelo if isinstance(conteudo_modelo, str)
                 else "Midia enviada pelo usuario."
             )
+
+        print(f"Conteudo modelo: {conteudo_modelo}, Conteudo historico: {conteudo_historico}")
 
         return conteudo_modelo, conteudo_historico

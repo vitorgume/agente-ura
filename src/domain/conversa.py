@@ -12,4 +12,3 @@ class Conversa:
     finalizada: bool
     cliente_id_cliente: Optional[str]
     vendedor_id_vendedor: Optional[str]
-    inativa: bool = False
