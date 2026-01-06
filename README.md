@@ -1,4 +1,4 @@
-# Cotalizer – API Agente
+# API Agente
 
 ---
 
