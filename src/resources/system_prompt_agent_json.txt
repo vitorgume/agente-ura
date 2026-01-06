@@ -17,16 +17,13 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
     - Nome (obrigatório): Nome coletado do cliente
     - Segmento (obrigatório): Segmento coletado do cliente
     - Região (obrigatório): Região de atuação coletado do cliente
-    - Descrição material: Trazer uma breve descrição do material que o cliente precisa fazer
     - Endereço real: Endereço que o cliente forneceu
 
 {
 "nome": "{Nome do cliente}",
 "segmento": {Segmento do cliente},
 "regiao": {Região do cliente},
-"descricao_material": {Descrição da necessidade do cliente}
 "endereco_real": {O endereço realmente fornecido pelo cliente}
-
 }
 
 ## Regras para preenchimento de "nome" em JSON resultado (obrigatório)
@@ -38,7 +35,6 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 "nome": "{Nome do cliente}",
 "segmento": 0,
 "regiao": 0,
-"descricao_material": "",
 "endereco_real": ""
 }
 
@@ -69,19 +65,6 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 4. No JSON **sempre** coloque o valor relacionado a região, exemplo, caso identifique que o cliente se encaixa na região *MARINGA*, no JSON, no campo regiao coloque o valor 1
 5. Sempre coloque o número correspondente, nunca um texto.
 
-## Regras para preenchimento de "descricao_material" em JSON resultado (obrigatório)
-
-1. Compreender de acordo com o texto a descrição do material que o usuário precisa.
-2. Preencha "descricao_material" com a descrição do material do cliente que foi definido em `JSON resultado`. **Não mostre o JSON resultado ao usuário**. O arquivo deve ficar próximo deste formato:
-
-{
-"nome": "",
-"segmento": 0,
-"regiao": 0,
-"descricao_material": "{Descrição do material}",
-"endereco_real": ""
-}
-
 ## Regras para preenchimento de "endereco_real" em JSON resultado (obrigatório)
 
 1. Identificar qual foi o endereço que o cliente forneceu, onde antes você qualificou dentro das regiões, agora basta preencher com esse endereço.
@@ -90,7 +73,6 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 "nome": "",
 "segmento": 0,
 "regiao": 0,
-"descricao_material": "",
 "endereco_real": "{Endereço real}"
 }
 
@@ -104,7 +86,6 @@ O fluxo consiste em receber um texto com todas as informações já coletadas do
 "nome": string,
 "segmento": numerico,
 "regiao": numerico,
-"descricao_material": string
 "endereco_real": string
 }
 
@@ -125,8 +106,6 @@ O usuário se chama Vitor, a empresa dele atua em São Paulo, é do segmento de 
 “regiao”: 3,
 
 “segmento”: 2,
-
-“descricao_material”: “50 sacolas tradicionais”
 
 "endereco_real": "São Paulo"
 
