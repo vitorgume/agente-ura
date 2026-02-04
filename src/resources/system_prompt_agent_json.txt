@@ -57,10 +57,10 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 
 1. Compreender de acordo com o texto a região de atuação do usuário.
 2. Ao entender qual a região ele é, enquadre a região dele a uma das seguintes regiões já pré-estabelecidos:
-    1. *MARINGA - 0*
-    2. *REGIAO_MARINGA - 1*
-    3. *OUTRA - 2*
-    4. *NAO_INFORMADA - 3*
+    1. *MARINGA - 1*
+    2. *REGIAO_MARINGA - 2*
+    3. *OUTRA - 3*
+    4. *NAO_INFORMADA - 4*
 3. Caso não consiga enquadra a região coletada do cliente em alguns dessas regiões listadas, enquadre em *OUTRA.* Na dúvida sempre qualifique em *OUTRA.*
 4. No JSON **sempre** coloque o valor relacionado a região, exemplo, caso identifique que o cliente se encaixa na região *MARINGA*, no JSON, no campo regiao coloque o valor 1
 5. Sempre coloque o número correspondente, nunca um texto.
