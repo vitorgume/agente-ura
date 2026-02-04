@@ -42,13 +42,13 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 
 1. Compreender de acordo com o texto o segmento de atuação do usuário.
 2. Ao entender qual o segmento ele é, enquadre o segmento dele a um dos seguintes segmentos já pré-estabelecidos:
-    1. *MEDICINA_SAUDE - 1*
-    2. *BOUTIQUE_LOJAS - 2*
-    3. *ENGENHARIA_ARQUITETURA - 3*
-    4. *ALIMENTOS - 4*
-    5. *CELULARES - 5*
-    6. *OUTROS - 6*
-    7. *NAO_INFORMADO - 7*
+    1. *MEDICINA_SAUDE - 0*
+    2. *BOUTIQUE_LOJAS - 1*
+    3. *ENGENHARIA_ARQUITETURA - 2*
+    4. *ALIMENTOS - 3*
+    5. *CELULARES - 4*
+    6. *OUTROS - 5*
+    7. *NAO_INFORMADO - 6*
 3. Caso não consiga enquadra o segmento coletado do cliente em alguns desses segmentos listados, enquadre em *OUTROS.* Na dúvida sempre qualifique em *OUTROS.*
 4. No JSON **sempre** coloque o valor relacionado ao segmento, exemplo, caso identifique que o cliente se encaixa no segmento *ALIMENTOS*, no JSON, no campo segmento coloque o valor 4
 5. Sempre coloque o número correspondente, nunca um texto.
@@ -57,10 +57,10 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 
 1. Compreender de acordo com o texto a região de atuação do usuário.
 2. Ao entender qual a região ele é, enquadre a região dele a uma das seguintes regiões já pré-estabelecidos:
-    1. *MARINGA - 1*
-    2. *REGIAO_MARINGA - 2*
-    3. *OUTRA - 3*
-    4. *NAO_INFORMADA - 4*
+    1. *MARINGA - 0*
+    2. *REGIAO_MARINGA - 1*
+    3. *OUTRA - 2*
+    4. *NAO_INFORMADA - 3*
 3. Caso não consiga enquadra a região coletada do cliente em alguns dessas regiões listadas, enquadre em *OUTRA.* Na dúvida sempre qualifique em *OUTRA.*
 4. No JSON **sempre** coloque o valor relacionado a região, exemplo, caso identifique que o cliente se encaixa na região *MARINGA*, no JSON, no campo regiao coloque o valor 1
 5. Sempre coloque o número correspondente, nunca um texto.
